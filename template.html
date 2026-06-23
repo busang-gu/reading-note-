@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>독서 실행 노트 — 읽고 · 기록하고 · 실행하기 | 부상구</title>
+<meta name="description" content="화면에서 바로 채우고 A4 한 장으로 인쇄하는 독서 실행 노트. 핵심 문장 → 내 생각 → 24시간 안에 할 일까지.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --font-ko:'Pretendard Variable','Pretendard',system-ui,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  --green:#5CB85C;--green-dark:#3E8E41;--green-light:#E8F8E8;--green-tint:#F5FBF0;--gold:#F5C842;
+  --ink:#14181F;--text-1:#1F2630;--text-2:#3C4654;--text-3:#6B7686;--muted:#9AA4B2;
+  --bg-soft:#F0F2F5;--line:#D8DDE4;--line-soft:#E9ECF1;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-ko);background:var(--bg-soft);color:var(--text-1);line-height:1.6;letter-spacing:-.01em;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.skip-link{position:absolute;left:-9999px;top:0;background:var(--green);color:#fff;padding:10px 16px;z-index:200}
+.skip-link:focus{left:0}
+
+/* ===== 상단 툴바 (화면 전용) ===== */
+.toolbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.toolbar-inner{max-width:880px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.tb-left{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px;letter-spacing:-.02em}
+.tb-left .peng{width:30px;height:30px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;font-size:17px;overflow:hidden}
+.tb-left .peng img{width:100%;height:100%;object-fit:cover}
+.tb-left a{color:var(--text-3);font-weight:600;font-size:13px}
+.tb-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;border:1.5px solid transparent;cursor:pointer;transition:transform .15s,box-shadow .2s,background .2s;letter-spacing:-.01em}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 6px 16px rgba(92,184,92,.26)}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--text-2);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green-dark)}
+.btn:focus-visible{outline:3px solid rgba(92,184,92,.4);outline-offset:2px}
+.save-hint{font-size:12.5px;color:var(--muted);align-self:center}
+.save-hint b{color:var(--green-dark)}
+
+/* ===== 안내 배너 ===== */
+.tip{max-width:880px;margin:18px auto 0;padding:0 20px}
+.tip-inner{background:var(--green-tint);border:1px solid var(--green-light);border-radius:var(--radius);padding:13px 18px;font-size:13.5px;color:var(--text-2);display:flex;gap:9px;align-items:flex-start}
+.tip-inner b{color:var(--green-dark)}
+
+/* ===== A4 시트 ===== */
+.sheet-wrap{max-width:880px;margin:20px auto 60px;padding:0 20px}
+.sheet{background:#fff;border-radius:var(--radius);box-shadow:0 12px 40px rgba(20,24,31,.1);padding:48px 52px;}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:8px}
+.doc-head .title h1{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
+.doc-head .title .en{font-size:11.5px;font-weight:700;letter-spacing:.18em;color:var(--green-dark);margin-top:5px}
+.doc-head .peng-spot{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:none}
+.doc-head .peng-spot img{width:100%;height:100%;object-fit:cover;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+
+.block{margin-top:26px}
+.block-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--ink);margin-bottom:12px}
+.block-label .tag{font-size:11px;font-weight:800;color:#fff;background:var(--green);border-radius:6px;padding:3px 8px;letter-spacing:.04em}
+.block-label .hint{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+
+/* 입력 필드 (contenteditable) */
+.field{
+  border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;
+  font-size:15px;line-height:1.7;color:var(--text-1);min-height:46px;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+  word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;
+}
+.field:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(92,184,92,.14)}
+.field.lined{background-image:repeating-linear-gradient(transparent,transparent 33px,var(--line-soft) 33px,var(--line-soft) 34px);background-position:0 12px}
+.field[data-ph]:empty::before{content:attr(data-ph);color:var(--muted);pointer-events:none}
+.field.big{min-height:84px}
+
+/* 책 정보 그리드 */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-grid .cell{display:flex;flex-direction:column;gap:6px}
+.info-grid .cell .k{font-size:12px;font-weight:700;color:var(--text-3)}
+.info-grid .field{min-height:42px}
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+
+/* 핵심 문장 */
+.quote-row{display:flex;gap:12px;margin-bottom:12px;align-items:stretch}
+.quote-row .qn{flex:none;width:34px;border-radius:9px;background:var(--green-light);color:var(--green-dark);font-weight:800;font-size:15px;display:grid;place-items:center}
+.quote-row .qbody{flex:1;display:flex;flex-direction:column;gap:8px}
+.quote-row .qbody .field{min-height:40px}
+.quote-row .page{display:flex;align-items:center;gap:7px}
+.quote-row .page .pk{font-size:12px;font-weight:700;color:var(--text-3);white-space:nowrap}
+.quote-row .page .field{min-height:34px;max-width:140px;padding:6px 12px}
+
+/* 실행 항목 */
+.action{display:flex;gap:11px;align-items:flex-start;margin-bottom:11px}
+.action .chk{flex:none;width:24px;height:24px;margin-top:9px;border-radius:7px;border:2px solid var(--green);background:#fff;cursor:pointer;appearance:none;-webkit-appearance:none;display:grid;place-items:center;transition:background .15s}
+.action .chk:checked{background:var(--green)}
+.action .chk:checked::after{content:"✓";color:#fff;font-size:15px;font-weight:800}
+.action .chk:focus-visible{outline:3px solid rgba(92,184,92,.4);outline-offset:2px}
+.action .abody{flex:1}
+.action .when{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.03em;padding:3px 9px;border-radius:6px;margin-bottom:6px}
+.action .when.now{background:#FDECEC;color:#C84545}
+.action .when.week{background:var(--green-light);color:var(--green-dark)}
+.action .when.exp{background:#FFF6DB;color:#A57C12}
+
+.callout{background:var(--green-tint);border:1.5px solid var(--green-light);border-radius:12px;padding:16px 18px;margin-top:26px}
+.callout .block-label{margin-bottom:10px}
+
+.foot-note{margin-top:32px;padding-top:18px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--muted)}
+.foot-note .brand{font-weight:700;color:var(--text-3)}
+
+/* ===== 인쇄 ===== */
+@media print{
+  @page{size:A4;margin:13mm}
+  body{background:#fff}
+  .toolbar,.tip,.skip-link{display:none!important}
+  .sheet-wrap{max-width:none!important;width:100%;margin:0;padding:0}
+  .sheet{box-shadow:none;border-radius:0;padding:4px 0}
+  .field{border-color:#B9C0CA}
+  .field:focus{box-shadow:none}
+  .field.lined{background-image:repeating-linear-gradient(transparent,transparent 33px,#EDEFF2 33px,#EDEFF2 34px)}
+  .action .chk{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .block,.callout{break-inside:avoid}
+  .doc-head{break-after:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#sheet">본문으로 건너뛰기</a>
+
+<div class="toolbar" role="group" aria-label="노트 도구">
+  <div class="toolbar-inner">
+    <div class="tb-left">
+      <span class="peng"><img src="assets/mascot.jpg" alt="" aria-hidden="true"></span>
+      <span>독서 실행 노트</span>
+      <a href="index.html" aria-label="소개 페이지로">· 소개 보기</a>
+    </div>
+    <div class="tb-actions">
+      <span class="save-hint" id="saveHint" aria-live="polite">자동 저장됨 <b>✓</b></span>
+      <button class="btn btn-ghost" id="newBtn" type="button">＋ 새 노트</button>
+      <button class="btn btn-primary" id="printBtn" type="button">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="tip">
+  <div class="tip-inner">
+    <span aria-hidden="true">💡</span>
+    <span><b>이렇게 쓰세요.</b> 칸을 클릭해 바로 입력하면 이 브라우저에 자동 저장돼요. 다 쓰면 <b>‘인쇄 / PDF 저장’</b>으로 A4 한 장으로 남기세요. 인쇄 창에서 ‘대상 → PDF로 저장’을 고르면 파일로도 보관됩니다.</span>
+  </div>
+</div>
+
+<div class="sheet-wrap">
+  <article class="sheet" id="sheet">
+
+    <header class="doc-head">
+      <div class="title">
+        <h1>독서 실행 노트</h1>
+        <div class="en">READ · RECORD · RUN</div>
+      </div>
+      <div class="peng-spot"><img src="assets/mascot.jpg" alt="부상구 새싹펭귄 마스코트"></div>
+    </header>
+
+    <!-- 1. 책 정보 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">01</span> 책 정보</div>
+      <div class="info-grid">
+        <div class="cell"><span class="k">제목</span><div class="field" contenteditable="true" data-key="title" data-ph="읽은 책 제목" role="textbox" aria-label="책 제목"></div></div>
+        <div class="cell"><span class="k">저자</span><div class="field" contenteditable="true" data-key="author" data-ph="지은이" role="textbox" aria-label="저자"></div></div>
+        <div class="cell"><span class="k">읽은 기간</span><div class="field" contenteditable="true" data-key="period" data-ph="예) 6/10 ~ 6/22" role="textbox" aria-label="읽은 기간"></div></div>
+        <div class="cell"><span class="k">분야 / 한줄 분류</span><div class="field" contenteditable="true" data-key="genre" data-ph="예) 자기계발, 돈 공부" role="textbox" aria-label="분야"></div></div>
+      </div>
+    </section>
+
+    <!-- 2. 읽는 목적 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">02</span> 왜 이 책을 폈나 <span class="hint">— 한 줄 목적</span></div>
+      <div class="field" contenteditable="true" data-key="purpose" data-ph="예) 돈을 모으는데 자꾸 새는 이유를 알고 싶어서" role="textbox" aria-label="읽는 목적"></div>
+    </section>
+
+    <!-- 3. 핵심 문장 3 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">03</span> 핵심 문장 3 <span class="hint">— 그대로 옮겨 적기</span></div>
+
+      <div class="quote-row">
+        <div class="qn">1</div>
+        <div class="qbody">
+          <div class="field" contenteditable="true" data-key="q1" data-ph="꽂힌 문장을 그대로 옮겨 적어요" role="textbox" aria-label="핵심 문장 1"></div>
+          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q1p" data-ph="쪽수" role="textbox" aria-label="문장 1 쪽수"></div></div>
+        </div>
+      </div>
+      <div class="quote-row">
+        <div class="qn">2</div>
+        <div class="qbody">
+          <div class="field" contenteditable="true" data-key="q2" data-ph="두 번째 문장" role="textbox" aria-label="핵심 문장 2"></div>
+          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q2p" data-ph="쪽수" role="textbox" aria-label="문장 2 쪽수"></div></div>
+        </div>
+      </div>
+      <div class="quote-row">
+        <div class="qn">3</div>
+        <div class="qbody">
+          <div class="field" contenteditable="true" data-key="q3" data-ph="세 번째 문장" role="textbox" aria-label="핵심 문장 3"></div>
+          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q3p" data-ph="쪽수" role="textbox" aria-label="문장 3 쪽수"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 내 언어 요약 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">04</span> 내 언어로 한 줄 요약 <span class="hint">— 이 책이 나에게 한 말</span></div>
+      <div class="field lined big" contenteditable="true" data-key="summary" data-ph="이 책을 친구에게 한 문장으로 설명한다면?" role="textbox" aria-label="내 언어 요약"></div>
+    </section>
+
+    <!-- 5. 나에게 꽂힌 이유 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">05</span> 내 상황과의 연결 <span class="hint">— 왜 나에게 와닿았나</span></div>
+      <div class="field lined big" contenteditable="true" data-key="connect" data-ph="지금 내 상황·고민과 어떻게 연결되는지 적어요" role="textbox" aria-label="내 상황과의 연결"></div>
+    </section>
+
+    <!-- 6. 실행 항목 -->
+    <section class="block callout">
+      <div class="block-label"><span class="tag">06</span> 🚀 실행 항목 <span class="hint">— 읽기를 행동으로</span></div>
+
+      <div class="action">
+        <input type="checkbox" class="chk" data-key="a1c" aria-label="실행1 완료">
+        <div class="abody">
+          <span class="when now">⏱ 24시간 안에</span>
+          <div class="field" contenteditable="true" data-key="a1" data-ph="지금 당장 할 수 있는 가장 작은 행동 하나" role="textbox" aria-label="24시간 안에 할 일"></div>
+        </div>
+      </div>
+      <div class="action">
+        <input type="checkbox" class="chk" data-key="a2c" aria-label="실행2 완료">
+        <div class="abody">
+          <span class="when week">📅 이번 주에</span>
+          <div class="field" contenteditable="true" data-key="a2" data-ph="이번 주 안에 시도해볼 일" role="textbox" aria-label="이번 주에 할 일"></div>
+        </div>
+      </div>
+      <div class="action">
+        <input type="checkbox" class="chk" data-key="a3c" aria-label="실행3 완료">
+        <div class="abody">
+          <span class="when exp">🧪 실험해볼 것</span>
+          <div class="field" contenteditable="true" data-key="a3" data-ph="한 번 테스트해보고 싶은 것 (선택)" role="textbox" aria-label="실험해볼 것"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 2주 뒤 회고 -->
+    <section class="block">
+      <div class="block-label"><span class="tag">07</span> 2주 뒤 회고 <span class="hint">— 다시 펴보고 적기</span></div>
+      <div class="info-grid">
+        <div class="cell"><span class="k">회고 날짜</span><div class="field" contenteditable="true" data-key="rdate" data-ph="언제 다시 볼지" role="textbox" aria-label="회고 날짜"></div></div>
+        <div class="cell"><span class="k">실행했나요?</span><div class="field" contenteditable="true" data-key="rdone" data-ph="했다 / 못 했다 + 이유" role="textbox" aria-label="실행 여부"></div></div>
+      </div>
+      <div class="field lined big" contenteditable="true" data-key="reflect" data-ph="실행 후 뭐가 달라졌는지 / 다음엔 무엇을 바꿀지" role="textbox" aria-label="회고 내용" style="margin-top:12px"></div>
+    </section>
+
+    <div class="foot-note">
+      <span class="brand">🐧 부상구 독서 노트 · 읽고 · 기록하고 · 실행하기</span>
+      <span>읽은 건 많은데 남는 게 없다면, 기록부터.</span>
+    </div>
+  </article>
+</div>
+
+<script>
+(function(){
+  var KEY='busangu_reading_note_v1';
+  var fields=Array.prototype.slice.call(document.querySelectorAll('[data-key]'));
+  var hint=document.getElementById('saveHint');
+  var saveTimer=null;
+
+  // 불러오기
+  function load(){
+    var raw;
+    try{raw=localStorage.getItem(KEY);}catch(e){raw=null;}
+    if(!raw)return;
+    var data;
+    try{data=JSON.parse(raw);}catch(e){return;}
+    fields.forEach(function(el){
+      var k=el.getAttribute('data-key');
+      if(!(k in data))return;
+      if(el.type==='checkbox'){el.checked=!!data[k];}
+      else{el.textContent=data[k];}
+    });
+  }
+  // 저장
+  function save(){
+    var data={};
+    fields.forEach(function(el){
+      var k=el.getAttribute('data-key');
+      data[k]=(el.type==='checkbox')?el.checked:el.textContent;
+    });
+    try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
+    flash();
+  }
+  function flash(){
+    hint.innerHTML='자동 저장됨 <b>✓</b>';
+    hint.style.opacity='1';
+  }
+  function queueSave(){
+    hint.textContent='저장 중…';hint.style.opacity='.7';
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(save,500);
+  }
+
+  fields.forEach(function(el){
+    if(el.type==='checkbox'){el.addEventListener('change',save);}
+    else{el.addEventListener('input',queueSave);}
+  });
+
+  // contenteditable 붙여넣기 → 순수 텍스트로
+  fields.forEach(function(el){
+    if(el.type==='checkbox')return;
+    el.addEventListener('paste',function(e){
+      e.preventDefault();
+      var t=((e.clipboardData||window.clipboardData).getData('text/plain'))||'';
+      var sel=window.getSelection();
+      if(sel&&sel.rangeCount){
+        var range=sel.getRangeAt(0);
+        range.deleteContents();
+        var node=document.createTextNode(t);
+        range.insertNode(node);
+        range.setStartAfter(node);range.collapse(true);
+        sel.removeAllRanges();sel.addRange(range);
+      }else{
+        el.textContent+=t;
+      }
+      queueSave();
+    });
+  });
+
+  // 새 노트
+  document.getElementById('newBtn').addEventListener('click',function(){
+    if(!confirm('지금 작성한 내용을 비우고 새 노트를 시작할까요?\\n(인쇄·저장하지 않은 내용은 사라져요)'))return;
+    try{localStorage.removeItem(KEY);}catch(e){}
+    fields.forEach(function(el){
+      if(el.type==='checkbox'){el.checked=false;}else{el.textContent='';}
+    });
+    fields[0].focus();
+  });
+
+  // 인쇄
+  document.getElementById('printBtn').addEventListener('click',function(){window.print();});
+
+  load();
+})();
+</script>
+</body>
+</html>
