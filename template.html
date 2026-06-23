@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>독서 실행 노트 — 읽고 · 기록하고 · 실행하기 | 부상구</title>
-<meta name="description" content="화면에서 바로 채우고 A4 한 장으로 인쇄하는 독서 실행 노트. 핵심 문장 → 내 생각 → 24시간 안에 할 일까지.">
+<meta name="description" content="화면에서 바로 채우고 A4로 인쇄하는 독서 실행 워크북. 읽기 전·읽는 중·읽은 후·실행·회고까지 한 흐름으로.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -44,17 +44,30 @@ a{color:inherit;text-decoration:none}
 .tip-inner{background:var(--green-tint);border:1px solid var(--green-light);border-radius:var(--radius);padding:13px 18px;font-size:13.5px;color:var(--text-2);display:flex;gap:9px;align-items:flex-start}
 .tip-inner b{color:var(--green-dark)}
 
+/* ===== 진행 칩 (화면 전용 목차) ===== */
+.toc{max-width:880px;margin:14px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:8px}
+.toc a{font-size:12px;font-weight:700;color:var(--text-3);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;transition:border-color .15s,color .15s}
+.toc a:hover{border-color:var(--green);color:var(--green-dark)}
+
 /* ===== A4 시트 ===== */
 .sheet-wrap{max-width:880px;margin:20px auto 60px;padding:0 20px}
 .sheet{background:#fff;border-radius:var(--radius);box-shadow:0 12px 40px rgba(20,24,31,.1);padding:48px 52px;}
-.doc-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:8px}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:4px}
 .doc-head .title h1{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
 .doc-head .title .en{font-size:11.5px;font-weight:700;letter-spacing:.18em;color:var(--green-dark);margin-top:5px}
+.doc-head .title .meta{font-size:12px;color:var(--text-3);margin-top:6px}
 .doc-head .peng-spot{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:none}
 .doc-head .peng-spot img{width:100%;height:100%;object-fit:cover;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 
-.block{margin-top:26px}
-.block-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--ink);margin-bottom:12px}
+/* 파트 헤더 */
+.part{margin-top:34px}
+.part-head{display:flex;align-items:baseline;gap:11px;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:6px}
+.part-head .pt{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--green-dark)}
+.part-head .pn{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.part-head .pe{margin-left:auto;font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.12em}
+
+.block{margin-top:20px}
+.block-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--ink);margin-bottom:11px}
 .block-label .tag{font-size:11px;font-weight:800;color:#fff;background:var(--green);border-radius:6px;padding:3px 8px;letter-spacing:.04em}
 .block-label .hint{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
 
@@ -69,6 +82,7 @@ a{color:inherit;text-decoration:none}
 .field.lined{background-image:repeating-linear-gradient(transparent,transparent 33px,var(--line-soft) 33px,var(--line-soft) 34px);background-position:0 12px}
 .field[data-ph]:empty::before{content:attr(data-ph);color:var(--muted);pointer-events:none}
 .field.big{min-height:84px}
+.field.sm{min-height:40px}
 
 /* 책 정보 그리드 */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -76,6 +90,14 @@ a{color:inherit;text-decoration:none}
 .info-grid .cell .k{font-size:12px;font-weight:700;color:var(--text-3)}
 .info-grid .field{min-height:42px}
 @media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+
+/* 별점 */
+.stars{display:inline-flex;gap:5px;align-items:center}
+.stars .star{font-size:27px;line-height:1;background:none;border:none;padding:0;cursor:pointer;color:var(--line);transition:color .12s,transform .12s}
+.stars .star:hover{transform:scale(1.12)}
+.stars .star.on{color:var(--gold)}
+.stars .star:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:4px}
+.stars-num{margin-left:8px;font-size:13px;font-weight:800;color:var(--text-3)}
 
 /* 핵심 문장 */
 .quote-row{display:flex;gap:12px;margin-bottom:12px;align-items:stretch}
@@ -98,7 +120,7 @@ a{color:inherit;text-decoration:none}
 .action .when.week{background:var(--green-light);color:var(--green-dark)}
 .action .when.exp{background:#FFF6DB;color:#A57C12}
 
-.callout{background:var(--green-tint);border:1.5px solid var(--green-light);border-radius:12px;padding:16px 18px;margin-top:26px}
+.callout{background:var(--green-tint);border:1.5px solid var(--green-light);border-radius:12px;padding:18px 20px}
 .callout .block-label{margin-bottom:10px}
 
 .foot-note{margin-top:32px;padding-top:18px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--muted)}
@@ -108,15 +130,16 @@ a{color:inherit;text-decoration:none}
 @media print{
   @page{size:A4;margin:13mm}
   body{background:#fff}
-  .toolbar,.tip,.skip-link{display:none!important}
+  .toolbar,.tip,.toc,.skip-link{display:none!important}
   .sheet-wrap{max-width:none!important;width:100%;margin:0;padding:0}
   .sheet{box-shadow:none;border-radius:0;padding:4px 0}
   .field{border-color:#B9C0CA}
   .field:focus{box-shadow:none}
   .field.lined{background-image:repeating-linear-gradient(transparent,transparent 33px,#EDEFF2 33px,#EDEFF2 34px)}
   .action .chk{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .block,.callout{break-inside:avoid}
-  .doc-head{break-after:avoid}
+  .block,.callout,.quote-row,.action{break-inside:avoid}
+  .part-head,.block-label{break-after:avoid}
+  .part{break-inside:auto}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
@@ -142,9 +165,17 @@ a{color:inherit;text-decoration:none}
 <div class="tip">
   <div class="tip-inner">
     <span aria-hidden="true">💡</span>
-    <span><b>이렇게 쓰세요.</b> 칸을 클릭해 바로 입력하면 이 브라우저에 자동 저장돼요. 다 쓰면 <b>‘인쇄 / PDF 저장’</b>으로 A4 한 장으로 남기세요. 인쇄 창에서 ‘대상 → PDF로 저장’을 고르면 파일로도 보관됩니다.</span>
+    <span><b>이렇게 쓰세요.</b> 칸을 클릭해 바로 입력하면 이 브라우저에 자동 저장돼요. 한 번에 다 채우지 않아도 됩니다 — <b>읽기 전 → 읽는 중 → 읽은 후 → 2주 뒤</b> 나눠 적어도 좋아요. 다 쓰면 <b>‘인쇄 / PDF 저장’</b>으로 남기세요.</span>
   </div>
 </div>
+
+<nav class="toc" aria-label="노트 목차">
+  <a href="#partA">A. 읽기 전</a>
+  <a href="#partB">B. 읽는 중</a>
+  <a href="#partC">C. 읽은 후</a>
+  <a href="#partD">D. 실행</a>
+  <a href="#partE">E. 회고 · 정리</a>
+</nav>
 
 <div class="sheet-wrap">
   <article class="sheet" id="sheet">
@@ -153,102 +184,169 @@ a{color:inherit;text-decoration:none}
       <div class="title">
         <h1>독서 실행 노트</h1>
         <div class="en">READ · RECORD · RUN</div>
+        <div class="meta">한 권을 끝까지 — 읽기 전부터 2주 뒤 회고까지</div>
       </div>
       <div class="peng-spot"><img src="assets/mascot.jpg" alt="부상구 새싹펭귄 마스코트"></div>
     </header>
 
-    <!-- 1. 책 정보 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">01</span> 책 정보</div>
-      <div class="info-grid">
-        <div class="cell"><span class="k">제목</span><div class="field" contenteditable="true" data-key="title" data-ph="읽은 책 제목" role="textbox" aria-label="책 제목"></div></div>
-        <div class="cell"><span class="k">저자</span><div class="field" contenteditable="true" data-key="author" data-ph="지은이" role="textbox" aria-label="저자"></div></div>
-        <div class="cell"><span class="k">읽은 기간</span><div class="field" contenteditable="true" data-key="period" data-ph="예) 6/10 ~ 6/22" role="textbox" aria-label="읽은 기간"></div></div>
-        <div class="cell"><span class="k">분야 / 한줄 분류</span><div class="field" contenteditable="true" data-key="genre" data-ph="예) 자기계발, 돈 공부" role="textbox" aria-label="분야"></div></div>
-      </div>
-    </section>
+    <!-- ========== PART A. 읽기 전 ========== -->
+    <div class="part" id="partA">
+      <div class="part-head"><span class="pt">PART A</span><span class="pn">읽기 전</span><span class="pe">BEFORE</span></div>
 
-    <!-- 2. 읽는 목적 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">02</span> 왜 이 책을 폈나 <span class="hint">— 한 줄 목적</span></div>
-      <div class="field" contenteditable="true" data-key="purpose" data-ph="예) 돈을 모으는데 자꾸 새는 이유를 알고 싶어서" role="textbox" aria-label="읽는 목적"></div>
-    </section>
-
-    <!-- 3. 핵심 문장 3 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">03</span> 핵심 문장 3 <span class="hint">— 그대로 옮겨 적기</span></div>
-
-      <div class="quote-row">
-        <div class="qn">1</div>
-        <div class="qbody">
-          <div class="field" contenteditable="true" data-key="q1" data-ph="꽂힌 문장을 그대로 옮겨 적어요" role="textbox" aria-label="핵심 문장 1"></div>
-          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q1p" data-ph="쪽수" role="textbox" aria-label="문장 1 쪽수"></div></div>
+      <!-- 01 책 정보 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">01</span> 책 정보</div>
+        <div class="info-grid">
+          <div class="cell"><span class="k">제목</span><div class="field" contenteditable="true" data-key="title" data-ph="읽은 책 제목" role="textbox" aria-label="책 제목"></div></div>
+          <div class="cell"><span class="k">저자</span><div class="field" contenteditable="true" data-key="author" data-ph="지은이" role="textbox" aria-label="저자"></div></div>
+          <div class="cell"><span class="k">읽은 기간</span><div class="field" contenteditable="true" data-key="period" data-ph="예) 6/10 ~ 6/22" role="textbox" aria-label="읽은 기간"></div></div>
+          <div class="cell"><span class="k">분야 / 한줄 분류</span><div class="field" contenteditable="true" data-key="genre" data-ph="예) 자기계발, 돈 공부" role="textbox" aria-label="분야"></div></div>
         </div>
-      </div>
-      <div class="quote-row">
-        <div class="qn">2</div>
-        <div class="qbody">
-          <div class="field" contenteditable="true" data-key="q2" data-ph="두 번째 문장" role="textbox" aria-label="핵심 문장 2"></div>
-          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q2p" data-ph="쪽수" role="textbox" aria-label="문장 2 쪽수"></div></div>
-        </div>
-      </div>
-      <div class="quote-row">
-        <div class="qn">3</div>
-        <div class="qbody">
-          <div class="field" contenteditable="true" data-key="q3" data-ph="세 번째 문장" role="textbox" aria-label="핵심 문장 3"></div>
-          <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q3p" data-ph="쪽수" role="textbox" aria-label="문장 3 쪽수"></div></div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 4. 내 언어 요약 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">04</span> 내 언어로 한 줄 요약 <span class="hint">— 이 책이 나에게 한 말</span></div>
-      <div class="field lined big" contenteditable="true" data-key="summary" data-ph="이 책을 친구에게 한 문장으로 설명한다면?" role="textbox" aria-label="내 언어 요약"></div>
-    </section>
+      <!-- 02 읽는 목적 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">02</span> 왜 이 책을 폈나 <span class="hint">— 한 줄 목적</span></div>
+        <div class="field" contenteditable="true" data-key="purpose" data-ph="예) 돈을 모으는데 자꾸 새는 이유를 알고 싶어서" role="textbox" aria-label="읽는 목적"></div>
+      </section>
 
-    <!-- 5. 나에게 꽂힌 이유 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">05</span> 내 상황과의 연결 <span class="hint">— 왜 나에게 와닿았나</span></div>
-      <div class="field lined big" contenteditable="true" data-key="connect" data-ph="지금 내 상황·고민과 어떻게 연결되는지 적어요" role="textbox" aria-label="내 상황과의 연결"></div>
-    </section>
+      <!-- 03 기대 질문 (신규) -->
+      <section class="block">
+        <div class="block-label"><span class="tag">03</span> 이 책에서 답을 얻고 싶은 질문 <span class="hint">— 읽기 전 미리 던지기</span></div>
+        <div class="field lined big" contenteditable="true" data-key="qexpect" data-ph="예) 1) 어떻게 시작할까?  2) 첫 달에 뭘 바꿔야 할까?" role="textbox" aria-label="기대 질문"></div>
+      </section>
+    </div>
 
-    <!-- 6. 실행 항목 -->
-    <section class="block callout">
-      <div class="block-label"><span class="tag">06</span> 🚀 실행 항목 <span class="hint">— 읽기를 행동으로</span></div>
+    <!-- ========== PART B. 읽는 중 ========== -->
+    <div class="part" id="partB">
+      <div class="part-head"><span class="pt">PART B</span><span class="pn">읽는 중</span><span class="pe">DURING</span></div>
 
-      <div class="action">
-        <input type="checkbox" class="chk" data-key="a1c" aria-label="실행1 완료">
-        <div class="abody">
-          <span class="when now">⏱ 24시간 안에</span>
-          <div class="field" contenteditable="true" data-key="a1" data-ph="지금 당장 할 수 있는 가장 작은 행동 하나" role="textbox" aria-label="24시간 안에 할 일"></div>
+      <!-- 04 핵심 문장 3 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">04</span> 핵심 문장 3 <span class="hint">— 그대로 옮겨 적기</span></div>
+        <div class="quote-row">
+          <div class="qn">1</div>
+          <div class="qbody">
+            <div class="field" contenteditable="true" data-key="q1" data-ph="꽂힌 문장을 그대로 옮겨 적어요" role="textbox" aria-label="핵심 문장 1"></div>
+            <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q1p" data-ph="쪽수" role="textbox" aria-label="문장 1 쪽수"></div></div>
+          </div>
         </div>
-      </div>
-      <div class="action">
-        <input type="checkbox" class="chk" data-key="a2c" aria-label="실행2 완료">
-        <div class="abody">
-          <span class="when week">📅 이번 주에</span>
-          <div class="field" contenteditable="true" data-key="a2" data-ph="이번 주 안에 시도해볼 일" role="textbox" aria-label="이번 주에 할 일"></div>
+        <div class="quote-row">
+          <div class="qn">2</div>
+          <div class="qbody">
+            <div class="field" contenteditable="true" data-key="q2" data-ph="두 번째 문장" role="textbox" aria-label="핵심 문장 2"></div>
+            <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q2p" data-ph="쪽수" role="textbox" aria-label="문장 2 쪽수"></div></div>
+          </div>
         </div>
-      </div>
-      <div class="action">
-        <input type="checkbox" class="chk" data-key="a3c" aria-label="실행3 완료">
-        <div class="abody">
-          <span class="when exp">🧪 실험해볼 것</span>
-          <div class="field" contenteditable="true" data-key="a3" data-ph="한 번 테스트해보고 싶은 것 (선택)" role="textbox" aria-label="실험해볼 것"></div>
+        <div class="quote-row">
+          <div class="qn">3</div>
+          <div class="qbody">
+            <div class="field" contenteditable="true" data-key="q3" data-ph="세 번째 문장" role="textbox" aria-label="핵심 문장 3"></div>
+            <div class="page"><span class="pk">📄 page</span><div class="field" contenteditable="true" data-key="q3p" data-ph="쪽수" role="textbox" aria-label="문장 3 쪽수"></div></div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 7. 2주 뒤 회고 -->
-    <section class="block">
-      <div class="block-label"><span class="tag">07</span> 2주 뒤 회고 <span class="hint">— 다시 펴보고 적기</span></div>
-      <div class="info-grid">
-        <div class="cell"><span class="k">회고 날짜</span><div class="field" contenteditable="true" data-key="rdate" data-ph="언제 다시 볼지" role="textbox" aria-label="회고 날짜"></div></div>
-        <div class="cell"><span class="k">실행했나요?</span><div class="field" contenteditable="true" data-key="rdone" data-ph="했다 / 못 했다 + 이유" role="textbox" aria-label="실행 여부"></div></div>
-      </div>
-      <div class="field lined big" contenteditable="true" data-key="reflect" data-ph="실행 후 뭐가 달라졌는지 / 다음엔 무엇을 바꿀지" role="textbox" aria-label="회고 내용" style="margin-top:12px"></div>
-    </section>
+      <!-- 05 키워드 (신규) -->
+      <section class="block">
+        <div class="block-label"><span class="tag">05</span> 이 책을 3개의 키워드로 <span class="hint">— 나중에 검색될 단어</span></div>
+        <div class="field sm" contenteditable="true" data-key="keywords" data-ph="예) #복리  #자동이체  #작은습관" role="textbox" aria-label="키워드"></div>
+      </section>
+
+      <!-- 06 읽으며 떠오른 생각 (신규) -->
+      <section class="block">
+        <div class="block-label"><span class="tag">06</span> 읽으며 떠오른 생각 <span class="hint">— 동의·반박·질문 무엇이든</span></div>
+        <div class="field lined big" contenteditable="true" data-key="notes" data-ph="문장을 읽다 떠오른 내 생각을 자유롭게 적어요" role="textbox" aria-label="떠오른 생각"></div>
+      </section>
+    </div>
+
+    <!-- ========== PART C. 읽은 후 ========== -->
+    <div class="part" id="partC">
+      <div class="part-head"><span class="pt">PART C</span><span class="pn">읽은 후</span><span class="pe">AFTER</span></div>
+
+      <!-- 07 한 줄 요약 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">07</span> 내 언어로 한 줄 요약 <span class="hint">— 이 책이 나에게 한 말</span></div>
+        <div class="field lined big" contenteditable="true" data-key="summary" data-ph="이 책을 친구에게 한 문장으로 설명한다면?" role="textbox" aria-label="내 언어 요약"></div>
+      </section>
+
+      <!-- 08 내 상황과의 연결 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">08</span> 내 상황과의 연결 <span class="hint">— 왜 나에게 와닿았나</span></div>
+        <div class="field lined big" contenteditable="true" data-key="connect" data-ph="지금 내 상황·고민과 어떻게 연결되는지 적어요" role="textbox" aria-label="내 상황과의 연결"></div>
+      </section>
+
+      <!-- 09 가장 크게 바뀐 생각 (신규) -->
+      <section class="block">
+        <div class="block-label"><span class="tag">09</span> 가장 크게 바뀐 생각 하나 <span class="hint">— 읽기 전 ↔ 읽은 후</span></div>
+        <div class="field lined big" contenteditable="true" data-key="shift" data-ph="예) 전엔 ‘많이 벌어야 모은다’고 생각했는데, 이젠 ‘새는 걸 먼저 막는다’로 바뀌었다" role="textbox" aria-label="바뀐 생각"></div>
+      </section>
+    </div>
+
+    <!-- ========== PART D. 실행 ========== -->
+    <div class="part" id="partD">
+      <div class="part-head"><span class="pt">PART D</span><span class="pn">실행</span><span class="pe">ACTION</span></div>
+
+      <section class="block callout">
+        <div class="block-label"><span class="tag">10</span> 🚀 실행 항목 <span class="hint">— 읽기를 행동으로</span></div>
+        <div class="action">
+          <input type="checkbox" class="chk" data-key="a1c" aria-label="실행1 완료">
+          <div class="abody">
+            <span class="when now">⏱ 24시간 안에</span>
+            <div class="field" contenteditable="true" data-key="a1" data-ph="지금 당장 할 수 있는 가장 작은 행동 하나" role="textbox" aria-label="24시간 안에 할 일"></div>
+          </div>
+        </div>
+        <div class="action">
+          <input type="checkbox" class="chk" data-key="a2c" aria-label="실행2 완료">
+          <div class="abody">
+            <span class="when week">📅 이번 주에</span>
+            <div class="field" contenteditable="true" data-key="a2" data-ph="이번 주 안에 시도해볼 일" role="textbox" aria-label="이번 주에 할 일"></div>
+          </div>
+        </div>
+        <div class="action">
+          <input type="checkbox" class="chk" data-key="a3c" aria-label="실행3 완료">
+          <div class="abody">
+            <span class="when exp">🧪 실험해볼 것</span>
+            <div class="field" contenteditable="true" data-key="a3" data-ph="한 번 테스트해보고 싶은 것 (선택)" role="textbox" aria-label="실험해볼 것"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========== PART E. 회고 · 정리 ========== -->
+    <div class="part" id="partE">
+      <div class="part-head"><span class="pt">PART E</span><span class="pn">회고 · 정리</span><span class="pe">REVIEW</span></div>
+
+      <!-- 11 2주 뒤 회고 -->
+      <section class="block">
+        <div class="block-label"><span class="tag">11</span> 2주 뒤 회고 <span class="hint">— 다시 펴보고 적기</span></div>
+        <div class="info-grid">
+          <div class="cell"><span class="k">회고 날짜</span><div class="field" contenteditable="true" data-key="rdate" data-ph="언제 다시 볼지" role="textbox" aria-label="회고 날짜"></div></div>
+          <div class="cell"><span class="k">실행했나요?</span><div class="field" contenteditable="true" data-key="rdone" data-ph="했다 / 못 했다 + 이유" role="textbox" aria-label="실행 여부"></div></div>
+        </div>
+        <div class="field lined big" contenteditable="true" data-key="reflect" data-ph="실행 후 뭐가 달라졌는지 / 다음엔 무엇을 바꿀지" role="textbox" aria-label="회고 내용" style="margin-top:12px"></div>
+      </section>
+
+      <!-- 12 총평 (신규) -->
+      <section class="block">
+        <div class="block-label"><span class="tag">12</span> 총평 · 한 줄 추천 <span class="hint">— 한 권을 닫으며</span></div>
+        <div class="info-grid">
+          <div class="cell">
+            <span class="k">나의 별점</span>
+            <div class="stars" id="stars" data-key="rating" role="group" aria-label="별점 5점 만점">
+              <button type="button" class="star" data-val="1" aria-label="1점" aria-pressed="false">★</button>
+              <button type="button" class="star" data-val="2" aria-label="2점" aria-pressed="false">★</button>
+              <button type="button" class="star" data-val="3" aria-label="3점" aria-pressed="false">★</button>
+              <button type="button" class="star" data-val="4" aria-label="4점" aria-pressed="false">★</button>
+              <button type="button" class="star" data-val="5" aria-label="5점" aria-pressed="false">★</button>
+              <span class="stars-num" id="starsNum" aria-hidden="true">–</span>
+            </div>
+          </div>
+          <div class="cell"><span class="k">다음에 읽을 책</span><div class="field" contenteditable="true" data-key="nextbook" data-ph="이 책이 이어준 다음 한 권" role="textbox" aria-label="다음에 읽을 책"></div></div>
+        </div>
+        <div class="field lined big" contenteditable="true" data-key="verdict" data-ph="누구에게, 왜 추천(또는 비추천)하는지 한 줄로" role="textbox" aria-label="추천 한 줄" style="margin-top:12px"></div>
+      </section>
+    </div>
 
     <div class="foot-note">
       <span class="brand">🐧 부상구 독서 노트 · 읽고 · 기록하고 · 실행하기</span>
@@ -264,6 +362,30 @@ a{color:inherit;text-decoration:none}
   var hint=document.getElementById('saveHint');
   var saveTimer=null;
 
+  // 별점
+  var starsBox=document.getElementById('stars');
+  var starEls=starsBox?Array.prototype.slice.call(starsBox.querySelectorAll('.star')):[];
+  var starsNum=document.getElementById('starsNum');
+  function paintStars(val){
+    var n=parseInt(val,10)||0;
+    starEls.forEach(function(s){
+      var on=parseInt(s.getAttribute('data-val'),10)<=n;
+      s.classList.toggle('on',on);
+      s.setAttribute('aria-pressed',on?'true':'false');
+    });
+    if(starsNum)starsNum.textContent=n?(n+' / 5'):'–';
+    if(starsBox)starsBox.setAttribute('data-value',n?String(n):'');
+  }
+  starEls.forEach(function(s){
+    s.addEventListener('click',function(){
+      var v=parseInt(s.getAttribute('data-val'),10);
+      var cur=parseInt(starsBox.getAttribute('data-value'),10)||0;
+      if(v===cur)v=0; // 같은 별 다시 누르면 해제
+      paintStars(v);
+      queueSave();
+    });
+  });
+
   // 불러오기
   function load(){
     var raw;
@@ -274,7 +396,8 @@ a{color:inherit;text-decoration:none}
     fields.forEach(function(el){
       var k=el.getAttribute('data-key');
       if(!(k in data))return;
-      if(el.type==='checkbox'){el.checked=!!data[k];}
+      if(el.classList&&el.classList.contains('stars')){paintStars(data[k]);}
+      else if(el.type==='checkbox'){el.checked=!!data[k];}
       else{el.textContent=data[k];}
     });
   }
@@ -283,15 +406,14 @@ a{color:inherit;text-decoration:none}
     var data={};
     fields.forEach(function(el){
       var k=el.getAttribute('data-key');
-      data[k]=(el.type==='checkbox')?el.checked:el.textContent;
+      if(el.classList&&el.classList.contains('stars')){data[k]=el.getAttribute('data-value')||'';}
+      else if(el.type==='checkbox'){data[k]=el.checked;}
+      else{data[k]=el.textContent;}
     });
     try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
     flash();
   }
-  function flash(){
-    hint.innerHTML='자동 저장됨 <b>✓</b>';
-    hint.style.opacity='1';
-  }
+  function flash(){hint.innerHTML='자동 저장됨 <b>✓</b>';hint.style.opacity='1';}
   function queueSave(){
     hint.textContent='저장 중…';hint.style.opacity='.7';
     clearTimeout(saveTimer);
@@ -299,6 +421,7 @@ a{color:inherit;text-decoration:none}
   }
 
   fields.forEach(function(el){
+    if(el.classList&&el.classList.contains('stars'))return; // 별점은 위에서 처리
     if(el.type==='checkbox'){el.addEventListener('change',save);}
     else{el.addEventListener('input',queueSave);}
   });
@@ -306,6 +429,7 @@ a{color:inherit;text-decoration:none}
   // contenteditable 붙여넣기 → 순수 텍스트로
   fields.forEach(function(el){
     if(el.type==='checkbox')return;
+    if(el.classList&&el.classList.contains('stars'))return;
     el.addEventListener('paste',function(e){
       e.preventDefault();
       var t=((e.clipboardData||window.clipboardData).getData('text/plain'))||'';
@@ -317,19 +441,19 @@ a{color:inherit;text-decoration:none}
         range.insertNode(node);
         range.setStartAfter(node);range.collapse(true);
         sel.removeAllRanges();sel.addRange(range);
-      }else{
-        el.textContent+=t;
-      }
+      }else{el.textContent+=t;}
       queueSave();
     });
   });
 
   // 새 노트
   document.getElementById('newBtn').addEventListener('click',function(){
-    if(!confirm('지금 작성한 내용을 비우고 새 노트를 시작할까요?\\n(인쇄·저장하지 않은 내용은 사라져요)'))return;
+    if(!confirm('지금 작성한 내용을 비우고 새 노트를 시작할까요?\n(인쇄·저장하지 않은 내용은 사라져요)'))return;
     try{localStorage.removeItem(KEY);}catch(e){}
     fields.forEach(function(el){
-      if(el.type==='checkbox'){el.checked=false;}else{el.textContent='';}
+      if(el.classList&&el.classList.contains('stars')){paintStars(0);}
+      else if(el.type==='checkbox'){el.checked=false;}
+      else{el.textContent='';}
     });
     fields[0].focus();
   });
